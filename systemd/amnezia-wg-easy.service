@@ -10,12 +10,9 @@ EnvironmentFile=-/opt/amnezia-wg-easy/.env
 Environment=NODE_ENV=production
 Environment=DEBUG=Server,WireGuard
 Environment=WEB_ROOT=/opt/amnezia-wg-easy/src/www
-User=amnezia-wg-easy
-Group=amnezia-wg-easy
 ExecStart=/usr/local/bin/bun run server.js
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
-NoNewPrivileges=true
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
