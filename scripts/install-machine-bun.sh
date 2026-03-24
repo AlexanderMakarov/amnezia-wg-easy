@@ -37,7 +37,8 @@ apt-get install -y --no-install-recommends \
 
 if [[ ! -x "${BUN_BIN_PATH}" ]]; then
   mkdir -p "${BUN_INSTALL_DIR}"
-  BUN_INSTALL="${BUN_INSTALL_DIR}" curl -fsSL https://bun.sh/install | bash
+  export BUN_INSTALL="${BUN_INSTALL_DIR}"
+  curl -fsSL https://bun.sh/install | bash
   if [[ ! -x "${BUN_INSTALL_DIR}/bin/bun" ]]; then
     echo "Failed to install bun into ${BUN_INSTALL_DIR}/bin/bun"
     exit 1
