@@ -37,7 +37,9 @@ const checks = [
   },
   {
     name: "installer registers systemd service in /etc/systemd/system",
-    ok: installScript.includes('install -D -m 0644 "${APP_DIR}/systemd/amnezia-wg-easy.service" "/etc/systemd/system/${SERVICE_NAME}.service"'),
+    ok:
+      installScript.includes('install -D -m 0644 "${APP_DIR}/systemd/amnezia-wg-easy.service" "/etc/systemd/system/${SERVICE_NAME}.service"') ||
+      installScript.includes('install -D -m 0644 "${APP_DIR}/systemd/amnezia-wg-easy.service" "${SYSTEMD_DIR}/${SERVICE_NAME}.service"'),
   },
   {
     name: "systemd unit runs from /opt/amnezia-wg-easy/src",

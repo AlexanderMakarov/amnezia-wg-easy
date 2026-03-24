@@ -8,8 +8,9 @@ fi
 
 # shellcheck disable=SC1091
 source /etc/os-release
-if [[ "${ID:-}" != "ubuntu" ]]; then
-  echo "[FAIL] Ubuntu is required for this e2e install check. Detected: ${PRETTY_NAME:-unknown}."
+id_like_value="${ID_LIKE:-}"
+if [[ "${ID:-}" != "ubuntu" && "${id_like_value}" != *"ubuntu"* ]]; then
+  echo "[FAIL] Ubuntu-based distro is required for this e2e install check. Detected: ${PRETTY_NAME:-unknown}."
   exit 1
 fi
 

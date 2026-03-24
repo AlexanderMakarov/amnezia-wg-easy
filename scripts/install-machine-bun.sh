@@ -32,7 +32,6 @@ if [[ -f /etc/os-release ]]; then
 fi
 
 export DEBIAN_FRONTEND=noninteractive
-<<<<<<< HEAD
 if [[ "${INSTALL_SKIP_APT}" != "1" ]]; then
   apt-get update
   apt-get install -y --no-install-recommends \
@@ -42,14 +41,6 @@ if [[ "${INSTALL_SKIP_APT}" != "1" ]]; then
 else
   echo "INSTALL_SKIP_APT=1 -> skipping apt-get update/install."
 fi
-=======
-echo "Using apt/systemd setup steps (requires root) to install host packages and register a system service."
-apt-get update
-apt-get install -y --no-install-recommends \
-  curl ca-certificates gnupg unzip \
-  iptables iproute2 qrencode \
-  wireguard-tools
->>>>>>> 96c4069 (fix: accept ubuntu-based installs and add bun install-path tests)
 
 if ! command -v bun >/dev/null 2>&1; then
   curl -fsSL https://bun.sh/install | bash

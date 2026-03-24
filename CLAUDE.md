@@ -4,7 +4,7 @@
 
 - End-to-end installation verification is mandatory as part of this repository's test flow.
 - Run the Ubuntu-only install verification command **before pushing** any branch:
-  - `npm run test:before-push`
+  - `bun run test:before-push`
 - This check is intentionally Ubuntu + apt specific and must fail fast on non-Ubuntu or missing apt.
 
 ## Why sudo is required
