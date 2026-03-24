@@ -1,0 +1,19 @@
+[Unit]
+Description=Amnezia WG Easy (Bun runtime)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/amnezia-wg-easy/src
+EnvironmentFile=-/opt/amnezia-wg-easy/.env
+Environment=NODE_ENV=production
+Environment=DEBUG=Server,WireGuard
+Environment=WEB_ROOT=/opt/amnezia-wg-easy/src/www
+ExecStart=/root/.bun/bin/bun run server.js
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

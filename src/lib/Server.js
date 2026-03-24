@@ -131,7 +131,7 @@ module.exports = class Server {
         return {
           dicebear: DICEBEAR_TYPE,
           gravatar: USE_GRAVATAR,
-        }
+        };
       }))
 
       // Authentication
@@ -345,49 +345,45 @@ module.exports = class Server {
       });
     };
 
-    // Check Prometheus credentials
-    app.use(
-      fromNodeMiddleware((req, res, next) => {
-        if (!requiresPrometheusPassword || !req.url.startsWith('/metrics')) {
-          return next();
-        }
-        const user = basicAuth(req);
-        if (!user) {
-          res.statusCode = 401;
-          return { error: 'Not Logged In' };
-        }
-        if (user.pass) {
-          if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
+    if (ENABLE_PROMETHEUS_METRICS === 'true') {
+      // Check Prometheus credentials.
+      app.use(
+        fromNodeMiddleware((req, res, next) => {
+          if (!requiresPrometheusPassword || !req.url.startsWith('/metrics')) {
             return next();
           }
+          const user = basicAuth(req);
+          if (!user) {
+            res.statusCode = 401;
+            return { error: 'Not Logged In' };
+          }
+          if (user.pass) {
+            if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
+              return next();
+            }
+            res.statusCode = 401;
+            return { error: 'Incorrect Password' };
+          }
           res.statusCode = 401;
-          return { error: 'Incorrect Password' };
-        }
-        res.statusCode = 401;
-        return { error: 'Not Logged In' };
-      }),
-    );
+          return { error: 'Not Logged In' };
+        }),
+      );
 
-    // Prometheus Metrics API
-    const routerPrometheusMetrics = createRouter();
-    app.use(routerPrometheusMetrics);
+      // Prometheus Metrics API.
+      const routerPrometheusMetrics = createRouter();
+      app.use(routerPrometheusMetrics);
 
-    // Prometheus Routes
-    routerPrometheusMetrics
-      .get('/metrics', defineEventHandler(async (event) => {
-        setHeader(event, 'Content-Type', 'text/plain');
-        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+      // Prometheus routes.
+      routerPrometheusMetrics
+        .get('/metrics', defineEventHandler(async (event) => {
+          setHeader(event, 'Content-Type', 'text/plain');
           return WireGuard.getMetrics();
-        }
-        return '';
-      }))
-      .get('/metrics/json', defineEventHandler(async (event) => {
-        setHeader(event, 'Content-Type', 'application/json');
-        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+        }))
+        .get('/metrics/json', defineEventHandler(async (event) => {
+          setHeader(event, 'Content-Type', 'application/json');
           return WireGuard.getMetricsJSON();
-        }
-        return '';
-      }));
+        }));
+    }
 
     // backup_restore
     const router3 = createRouter();
@@ -407,7 +403,7 @@ module.exports = class Server {
       }));
 
     // Static assets
-    const publicDir = '/app/www';
+    const publicDir = process.env.WEB_ROOT || resolve(__dirname, '../www');
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {

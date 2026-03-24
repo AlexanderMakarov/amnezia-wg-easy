@@ -19,15 +19,26 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Automatic Light / Dark Mode
 * Multilanguage Support
 * Traffic Stats (default off)
-* One Time Links (default off)
+* One Time Links (disabled)
 * Client Expiry (default off)
-* Prometheus metrics support
+* Prometheus metrics support (disabled by default)
 
 ## Requirements
 
-* A host with Docker installed.
+* Linux host with WireGuard kernel support (`/dev/net/tun`).
+* Bun runtime (installer script below can install Bun automatically).
 
-## Installation
+## Installation (native Bun + systemd, no Docker)
+
+```bash
+git clone https://github.com/w0rng/amnezia-wg-easy
+cd amnezia-wg-easy
+sudo ./scripts/install-machine-bun.sh
+```
+
+The service will run as `amnezia-wg-easy` via systemd and load environment values from `/opt/amnezia-wg-easy/.env`.
+
+## Installation (Docker)
 
 ### 1. Install Docker
 
@@ -72,7 +83,7 @@ To automatically install & run wg-easy, simply run:
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-The Prometheus metrics will now be available on `http://0.0.0.0:51821/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
+Prometheus metrics are disabled by default. To expose them, set `ENABLE_PROMETHEUS_METRICS=true`.
 
 > 💡 Your configuration files will be saved in `~/.amnezia-wg-easy`
 
@@ -104,7 +115,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `UI_CHART_TYPE`               | `0`               | `1`                            | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart                                                                                               |
 | `DICEBEAR_TYPE`               | `false`           | `bottts`                       | see [dicebear types](https://www.dicebear.com/styles/)                                                                                                                                                                   |
 | `USE_GRAVATAR`                | `false`           | `true`                         | Use or not GRAVATAR service                                                                                                                                                                                              |
-| `WG_ENABLE_ONE_TIME_LINKS`    | `false`           | `true`                         | Enable display and generation of short one time download links (expire after 5 minutes)                                                                                                                                  |
+| `WG_ENABLE_ONE_TIME_LINKS`    | `false` (fixed)   | -                              | One-time links are intentionally disabled in this build.                                                                                                                                                                   |
 | `MAX_AGE`                     | `0`               | `1440`                         | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed.                                                                                                        |
 | `UI_ENABLE_SORT_CLIENTS`      | `false`           | `true`                         | Enable UI sort clients by name                                                                                                                                                                                           |
 | `ENABLE_PROMETHEUS_METRICS`   | `false`           | `true`                         | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`                                                                                                                         |
