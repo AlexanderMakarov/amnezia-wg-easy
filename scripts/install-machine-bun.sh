@@ -23,12 +23,16 @@ fi
 if [[ -f /etc/os-release ]]; then
   # shellcheck disable=SC1091
   source /etc/os-release
-  if [[ "${ID:-}" != "ubuntu" || "${VERSION_ID:-}" != "24.04" ]]; then
-    echo "Warning: this installer is validated for Ubuntu 24.04, continuing on ${PRETTY_NAME:-unknown}."
+  ID_LIKE_VALUE="${ID_LIKE:-}"
+  if [[ "${ID:-}" == "ubuntu" || "${ID_LIKE_VALUE}" == *"ubuntu"* ]]; then
+    echo "Detected Ubuntu-based Linux (${PRETTY_NAME:-unknown}); proceeding with supported install flow."
+  else
+    echo "Warning: officially supported on Ubuntu. Continuing on ${PRETTY_NAME:-unknown} with best-effort compatibility."
   fi
 fi
 
 export DEBIAN_FRONTEND=noninteractive
+<<<<<<< HEAD
 if [[ "${INSTALL_SKIP_APT}" != "1" ]]; then
   apt-get update
   apt-get install -y --no-install-recommends \
@@ -38,6 +42,14 @@ if [[ "${INSTALL_SKIP_APT}" != "1" ]]; then
 else
   echo "INSTALL_SKIP_APT=1 -> skipping apt-get update/install."
 fi
+=======
+echo "Using apt/systemd setup steps (requires root) to install host packages and register a system service."
+apt-get update
+apt-get install -y --no-install-recommends \
+  curl ca-certificates gnupg unzip \
+  iptables iproute2 qrencode \
+  wireguard-tools
+>>>>>>> 96c4069 (fix: accept ubuntu-based installs and add bun install-path tests)
 
 if ! command -v bun >/dev/null 2>&1; then
   curl -fsSL https://bun.sh/install | bash

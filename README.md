@@ -21,7 +21,8 @@ Run and manage AmneziaWG/WireGuard directly on a Linux host (no Docker).
 ## Requirements
 
 * Linux host with WireGuard kernel support (`/dev/net/tun`).
-* Ubuntu 24.04 (installer validated on ARM64 and x86_64).
+* Ubuntu (officially supported; installer validated on ARM64 and x86_64).
+* Other Linux distributions may work on a best-effort basis.
 * Root access to install service and networking dependencies.
 
 ## Install (native)
@@ -29,7 +30,17 @@ Run and manage AmneziaWG/WireGuard directly on a Linux host (no Docker).
 ```bash
 git clone https://github.com/AlexanderMakarov/amnezia-wg-easy
 cd amnezia-wg-easy
-sudo ./scripts/install-machine-bun.sh
+bun run install:machine
+```
+
+Why `sudo` is still needed: the install flow configures apt packages, writes to `/opt` and `/etc`, and registers a systemd service.
+
+## Bun-based verification flow
+
+Validate non-Docker install path expectations (APP_DIR + systemd wiring):
+
+```bash
+bun run test
 ```
 
 After install:

@@ -24,7 +24,7 @@ Enter your password:      // hidden prompt, type in your password
 PASSWORD_HASH='$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW'
 ```
 
-**Important** : make sure to enclose your password in **single quotes** when you run `docker run` command :
+**Important**: keep hashes wrapped in **single quotes** in shell commands and `.env` usage:
 
 ```bash
 $ echo $2b$12$coPqCsPtcF <-- not correct

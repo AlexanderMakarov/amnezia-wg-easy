@@ -1,9 +1,15 @@
 {
   "version": "1.0.1",
   "scripts": {
+    "install:machine:help": "echo 'Use sudo for install:machine because apt packages, /opt writes, and systemd registration require root privileges.'",
     "install:machine": "sudo ./scripts/install-machine-bun.sh",
+<<<<<<< HEAD
     "test:e2e-install:ubuntu": "bash ./scripts/test-e2e-install-ubuntu.sh",
     "test:before-push": "echo \"[PRE-PUSH] Ubuntu-only e2e install check uses apt and therefore needs sudo to modify system package state.\" && npm run test:e2e-install:ubuntu",
+=======
+    "test": "bun run test:install-path",
+    "test:install-path": "bun ./scripts/test-install-path.mjs",
+>>>>>>> 96c4069 (fix: accept ubuntu-based installs and add bun install-path tests)
     "start": "cd src && bun run start",
     "serve": "cd src && bun run serve",
     "lint": "cd src && bun run lint"
