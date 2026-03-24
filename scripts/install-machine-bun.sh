@@ -7,7 +7,13 @@ SERVICE_NAME="amnezia-wg-easy"
 APP_USER="${APP_USER:-amnezia-wg-easy}"
 APP_GROUP="${APP_GROUP:-amnezia-wg-easy}"
 ENV_FILE="${APP_DIR}/.env"
-WG_PATH_DEFAULT="/etc/amnezia/amneziawg"
+WG_PATH_DEFAULT="${WG_PATH_DEFAULT:-/etc/amnezia/amneziawg}"
+SYSTEMD_DIR="${SYSTEMD_DIR:-/etc/systemd/system}"
+INSTALL_SKIP_APT="${INSTALL_SKIP_APT:-0}"
+INSTALL_SKIP_BUN_INSTALL="${INSTALL_SKIP_BUN_INSTALL:-0}"
+INSTALL_SKIP_USER_SETUP="${INSTALL_SKIP_USER_SETUP:-0}"
+INSTALL_SKIP_CHOWN="${INSTALL_SKIP_CHOWN:-0}"
+INSTALL_SKIP_SYSTEMD_START="${INSTALL_SKIP_SYSTEMD_START:-0}"
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo "Run as root (required for systemd and WireGuard integration)."
@@ -23,11 +29,15 @@ if [[ -f /etc/os-release ]]; then
 fi
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get install -y --no-install-recommends \
-  curl ca-certificates gnupg unzip \
-  iptables iproute2 qrencode \
-  wireguard-tools
+if [[ "${INSTALL_SKIP_APT}" != "1" ]]; then
+  apt-get update
+  apt-get install -y --no-install-recommends \
+    curl ca-certificates gnupg unzip \
+    iptables iproute2 qrencode \
+    wireguard-tools
+else
+  echo "INSTALL_SKIP_APT=1 -> skipping apt-get update/install."
+fi
 
 if ! command -v bun >/dev/null 2>&1; then
   curl -fsSL https://bun.sh/install | bash
@@ -37,19 +47,27 @@ if [[ -x /root/.bun/bin/bun && ! -x /usr/local/bin/bun ]]; then
   ln -sf /root/.bun/bin/bun /usr/local/bin/bun
 fi
 
-if ! getent group "${APP_GROUP}" >/dev/null 2>&1; then
-  groupadd --system "${APP_GROUP}"
-fi
+if [[ "${INSTALL_SKIP_USER_SETUP}" != "1" ]]; then
+  if ! getent group "${APP_GROUP}" >/dev/null 2>&1; then
+    groupadd --system "${APP_GROUP}"
+  fi
 
-if ! id -u "${APP_USER}" >/dev/null 2>&1; then
-  useradd --system --home-dir "${APP_DIR}" --shell /usr/sbin/nologin -g "${APP_GROUP}" "${APP_USER}"
+  if ! id -u "${APP_USER}" >/dev/null 2>&1; then
+    useradd --system --home-dir "${APP_DIR}" --shell /usr/sbin/nologin -g "${APP_GROUP}" "${APP_USER}"
+  fi
+else
+  echo "INSTALL_SKIP_USER_SETUP=1 -> skipping user/group setup."
 fi
 
 mkdir -p "${APP_DIR}"
 tar -C "${REPO_DIR}" -cf - . | tar -C "${APP_DIR}" -xf -
 
-cd "${APP_DIR}/src"
-bun install --frozen-lockfile --production
+if [[ "${INSTALL_SKIP_BUN_INSTALL}" != "1" ]]; then
+  cd "${APP_DIR}/src"
+  bun install --frozen-lockfile --production
+else
+  echo "INSTALL_SKIP_BUN_INSTALL=1 -> skipping bun install."
+fi
 
 mkdir -p "${WG_PATH_DEFAULT}"
 chmod 700 "${WG_PATH_DEFAULT}"
@@ -78,12 +96,20 @@ EOF
   chmod 640 "${ENV_FILE}"
 fi
 
-chown -R "${APP_USER}:${APP_GROUP}" "${APP_DIR}"
-chown -R "${APP_USER}:${APP_GROUP}" "${WG_PATH_DEFAULT}"
+if [[ "${INSTALL_SKIP_CHOWN}" != "1" ]]; then
+  chown -R "${APP_USER}:${APP_GROUP}" "${APP_DIR}"
+  chown -R "${APP_USER}:${APP_GROUP}" "${WG_PATH_DEFAULT}"
+else
+  echo "INSTALL_SKIP_CHOWN=1 -> skipping chown."
+fi
 
-install -D -m 0644 "${APP_DIR}/systemd/amnezia-wg-easy.service" "/etc/systemd/system/${SERVICE_NAME}.service"
-systemctl daemon-reload
-systemctl enable --now "${SERVICE_NAME}.service"
+install -D -m 0644 "${APP_DIR}/systemd/amnezia-wg-easy.service" "${SYSTEMD_DIR}/${SERVICE_NAME}.service"
+if [[ "${INSTALL_SKIP_SYSTEMD_START}" != "1" ]]; then
+  systemctl daemon-reload
+  systemctl enable --now "${SERVICE_NAME}.service"
+else
+  echo "INSTALL_SKIP_SYSTEMD_START=1 -> skipping systemctl daemon-reload/enable."
+fi
 
 echo "Installed and started ${SERVICE_NAME}."
 echo "Edit ${ENV_FILE}, set WG_HOST and PASSWORD_HASH, then restart:"

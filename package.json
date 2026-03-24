@@ -2,6 +2,8 @@
   "version": "1.0.1",
   "scripts": {
     "install:machine": "sudo ./scripts/install-machine-bun.sh",
+    "test:e2e-install:ubuntu": "bash ./scripts/test-e2e-install-ubuntu.sh",
+    "test:before-push": "echo \"[PRE-PUSH] Ubuntu-only e2e install check uses apt and therefore needs sudo to modify system package state.\" && npm run test:e2e-install:ubuntu",
     "start": "cd src && bun run start",
     "serve": "cd src && bun run serve",
     "lint": "cd src && bun run lint"
