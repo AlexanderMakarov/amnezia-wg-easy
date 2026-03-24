@@ -1,5 +1,5 @@
 #!/bin/sh
-# This script is intended to be run only inside a docker container, not on the development host machine
+# Wrapper for host runtime usage
 set -e
 # proxy command
-node /app/wgpw.mjs "$@"
+bun "$(cd "$(dirname "$0")" && pwd)/wgpw.mjs" "$@"
