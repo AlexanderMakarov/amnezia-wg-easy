@@ -12,7 +12,7 @@ Environment=DEBUG=Server,WireGuard
 Environment=WEB_ROOT=/opt/amnezia-wg-easy/src/www
 User=amnezia-wg-easy
 Group=amnezia-wg-easy
-ExecStart=/usr/bin/env bun run server.js
+ExecStart=/usr/local/bin/bun run server.js
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
 NoNewPrivileges=true
